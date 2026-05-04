@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
-import { useAuth } from '@/contexts/AuthContext';
 import { assignmentAPI } from '@/services/api';
 import { 
   User, 

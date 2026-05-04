@@ -313,7 +313,7 @@ function AchievementsSection() {
 }
 
 export default function Dashboard() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const showTutor = searchParams.get('tutor') === 'true';
@@ -367,7 +367,6 @@ export default function Dashboard() {
               <GamificationStats 
                 points={gamificationStatus.points} 
                 level={gamificationStatus.level} 
-                nextLevelXP={gamificationStatus.nextLevelXP}
                 achievements={gamificationStatus.achievements}
               />
             </div>

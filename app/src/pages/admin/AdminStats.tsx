@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
-import { useAuth } from '@/contexts/AuthContext';
 import { analyticsAPI } from '@/services/api';
 import { 
   Users, 

@@ -11,7 +11,7 @@ interface GamificationStatsProps {
   achievements: any[];
 }
 
-const GamificationStats: React.FC<GamificationStatsProps> = ({ points, level, nextLevelXP, achievements }) => {
+const GamificationStats: React.FC<GamificationStatsProps> = ({ points, level, achievements }) => {
   const progress = (points % 500) / 5; // Points to percentage (assuming 500 XP per level)
   
   return (

@@ -155,7 +155,7 @@ export default function Lesson() {
     { id: 'quiz', label: t('lesson.quiz'), icon: HelpCircle },
     { id: 'tutor', label: t('lesson.tutor'), icon: MessageCircle },
     { id: 'recordings', label: 'Sessions', icon: Video },
-    { id: 'assignments', label: 'Tasks', icon: PenTool },
+    { id: 'assignments', label: 'Tasks', icon: Pen },
   ];
 
   return (
@@ -541,7 +541,7 @@ export default function Lesson() {
                                  </span>
                                ) : isExpired ? (
                                  <span className="text-[10px] text-red-500 font-medium flex items-center gap-1">
-                                   <AlertCircle className="w-3 h-3" /> Expired
+                                   <X className="w-3 h-3" /> Expired
                                  </span>
                                ) : (
                                  <Dialog>

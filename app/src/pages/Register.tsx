@@ -41,12 +41,15 @@ const Register: React.FC = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       role: 'learner',
     },
   });
+
+  const selectedRole = watch('role');
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
