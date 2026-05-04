@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 33% 96%;
+    --foreground: 0 0% 10%;
+    --card: 60 20% 90%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 0 82% 47%;
+    --primary-foreground: 60 33% 96%;
+    --secondary: 233 100% 22%;
+    --secondary-foreground: 60 33% 96%;
+    --muted: 60 10% 85%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 45 71% 52%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 10% / 0.1;
+    --input: 0 0% 10% / 0.1;
+    --ring: 0 82% 47%;
+    --radius: 0.125rem;
+    --sidebar-background: 60 20% 90%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 0 82% 47%;
+    --sidebar-primary-foreground: 60 33% 96%;
+    --sidebar-accent: 60 10% 85%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 10% / 0.1;
+    --sidebar-ring: 0 82% 47%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+  code, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[#D91A1A] text-white px-6 py-3 rounded-full font-medium transition-all duration-300;
+  }
+  .btn-primary:hover {
+    @apply shadow-[0_0_20px_rgba(217,26,26,0.3)] scale-105;
+  }
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+  .text-gradient {
+    background: linear-gradient(135deg, #D91A1A 0%, #001B71 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@keyframes waveform-flow {
+  0% { stop-color: #D91A1A; }
+  50% { stop-color: #F8F8F0; }
+  100% { stop-color: #D91A1A; }
+}
+
+.waveform-stop {
+  animation: waveform-flow 2s infinite linear;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(217, 26, 26, 0.15); }
+  50% { box-shadow: 0 0 30px rgba(217, 26, 26, 0.3); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F8F8F0;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(26, 26, 26, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 26, 26, 0.4);
+}
