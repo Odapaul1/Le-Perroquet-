@@ -41,7 +41,7 @@ interface RegisterData {
   lastName: string;
   email: string;
   password: string;
-  role?: 'learner' | 'instructor';
+  role?: 'learner' | 'instructor' | 'admin';
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -7,8 +7,6 @@ import {
   BookOpen, 
   DollarSign, 
   TrendingUp, 
-  BarChart3,
-  PieChart,
   ArrowUpRight,
   ArrowDownRight,
   Loader2
@@ -16,7 +14,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AdminStats: React.FC = () => {
-  const { user } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 

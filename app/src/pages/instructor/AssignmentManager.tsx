@@ -6,9 +6,7 @@ import {
   FileText, 
   Plus, 
   Calendar, 
-  Clock, 
   Trash2, 
-  AlertCircle,
   Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

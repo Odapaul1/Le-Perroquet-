@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
-import { useAuth } from '@/contexts/AuthContext';
 import { courseAPI } from '@/services/api';
 import { 
   Search, 
   Plus, 
   Filter, 
-  MoreVertical, 
   Edit, 
   Trash2, 
   Eye,
-  CheckCircle2,
-  XCircle
+  CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

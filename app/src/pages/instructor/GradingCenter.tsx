@@ -3,10 +3,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { assignmentAPI } from '@/services/api';
 import { 
-  CheckCircle2, 
-  Clock, 
   User, 
-  FileText, 
   ExternalLink,
   Search,
   Loader2,
@@ -20,7 +17,6 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const GradingCenter: React.FC = () => {
-  const { user } = useAuth();
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

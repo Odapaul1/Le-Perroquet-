@@ -6,8 +6,6 @@ import {
   Video, 
   Users, 
   PlusCircle, 
-  ChevronRight, 
-  Play, 
   FileText,
   Clock,
   MoreVertical
