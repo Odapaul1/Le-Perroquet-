@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, userAPI } from '../services/api';
 
 interface User {
   _id: string;
@@ -167,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const updatedUser = await authAPI.updateProfile(user._id, userData, tokens.accessToken);
+      const updatedUser = await userAPI.updateProfile(user._id, userData);
       setUser(updatedUser);
     } catch (error) {
       throw error;

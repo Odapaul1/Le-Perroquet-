@@ -21,7 +21,7 @@ const registerSchema = z.object({
     .min(6, 'Password must be at least 6 characters')
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number'),
   confirmPassword: z.string(),
-  role: z.enum(['learner', 'instructor', 'admin']).default('learner'),
+  role: z.enum(['learner', 'instructor', 'admin']),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -41,15 +41,12 @@ const Register: React.FC = () => {
     handleSubmit,
     formState: { errors },
     watch,
-    setValue,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       role: 'learner',
     },
   });
-
-  const selectedRole = watch('role');
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);

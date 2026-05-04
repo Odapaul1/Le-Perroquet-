@@ -17,7 +17,8 @@ import {
   Users,
   Video,
   FileText,
-  PlusCircle,
+  Plus,
+  Pen,
   BarChart3,
   Trophy,
 } from 'lucide-react';
@@ -60,8 +61,8 @@ export function Sidebar() {
       return [
         ...common,
         { icon: Video, label: 'My Courses', href: '/instructor/dashboard' },
-        { icon: PlayCircle, label: 'Recorded Sessions', href: '/instructor/sessions' },
-        { icon: PenTool, label: 'Assignments', href: '/instructor/assignments' },
+        { icon: Plus, label: 'Recorded Sessions', href: '/instructor/sessions' },
+        { icon: Pen, label: 'Assignments', href: '/instructor/assignments' },
         { icon: FileText, label: 'Grading Center', href: '/instructor/grading' },
       ];
     }

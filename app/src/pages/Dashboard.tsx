@@ -313,7 +313,7 @@ function AchievementsSection() {
 }
 
 export default function Dashboard() {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const showTutor = searchParams.get('tutor') === 'true';

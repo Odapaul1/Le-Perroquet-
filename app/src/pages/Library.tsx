@@ -3,12 +3,11 @@ import { Sidebar } from '@/components/Sidebar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { courses } from '@/data/courses';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { paymentAPI, enrollmentAPI } from '@/services/api';
 import {
   Search,
   Clock,
-  Play,
   Filter,
   CreditCard,
   Loader2,

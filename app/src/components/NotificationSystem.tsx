@@ -5,10 +5,8 @@ import { notificationAPI } from '@/services/api';
 import { 
   Bell, 
   CheckCircle2, 
-  AlertCircle, 
   FileText, 
   GraduationCap,
-  X,
   Circle
 } from 'lucide-react';
 import { Button } from './ui/button';
@@ -16,9 +14,7 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuLabel, 
   DropdownMenuTrigger,
-  DropdownMenuSeparator
 } from './ui/dropdown-menu';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';

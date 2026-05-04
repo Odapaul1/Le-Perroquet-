@@ -4,7 +4,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { sessionAPI, assignmentAPI } from '@/services/api';
 import { courses, lessons, quizQuestions, type ChatMessage } from '@/data/courses';
-import {
+import { 
   Play,
   Pause,
   CheckCircle,
@@ -21,12 +21,11 @@ import {
   Star,
   Clock,
   Video,
-  PenTool,
+  Pen,
   Calendar,
-  AlertCircle,
   Loader2,
-  ExternalLink,
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import gsap from 'gsap';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -591,7 +590,7 @@ export default function Lesson() {
                      </div>
                    ) : (
                      <div className="text-center py-12">
-                       <PenTool className="w-12 h-12 text-[#1A1A1A]/10 mx-auto mb-3" />
+                       <Pen className="w-12 h-12 text-[#1A1A1A]/10 mx-auto mb-3" />
                        <p className="text-sm text-[#6B6B6B]">No assignments found for this course.</p>
                      </div>
                    )}
