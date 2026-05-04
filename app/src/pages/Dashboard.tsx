@@ -27,20 +27,8 @@ import gsap from 'gsap';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ChatSystem } from '@/components/ChatSystem';
 
-function ProgressCard({ icon: Icon, label, value, color }: { icon: typeof Flame; label: string; value: string; color: string }) {
-  return (
-    <div className="bg-white rounded-sm p-5 border border-[#1A1A1A]/5 hover:shadow-md transition-shadow">
-      <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center mb-3`}>
-        <Icon className="w-5 h-5 text-white" />
-      </div>
-      <p className="text-2xl font-serif font-semibold text-[#1A1A1A]">{value}</p>
-      <p className="text-[#6B6B6B] text-sm">{label}</p>
-    </div>
-  );
-}
-
 function MyCourses() {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -357,7 +345,7 @@ export default function Dashboard() {
               {t('dashboard.welcome')}, {user?.firstName}
             </h1>
             <p className="text-[#6B6B6B]">
-              {language === 'en' ? 'Here is your learning progress today' : 'Voici votre progression d\'apprentissage aujourd\'hui'}
+              {t('dashboard.welcome_subtitle')}
             </p>
           </div>
 

@@ -7,7 +7,7 @@ import { Trophy, Star, TrendingUp } from 'lucide-react';
 interface GamificationStatsProps {
   points: number;
   level: number;
-  nextLevelXP: number;
+  nextLevelXP?: number;
   achievements: any[];
 }
 
