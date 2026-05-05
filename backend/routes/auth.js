@@ -61,7 +61,8 @@ router.post('/register', [
       lastName,
       email,
       password,
-      role
+      role,
+      isEmailVerified: true // Auto-verify for now to ensure app functionality
     });
 
     await user.save();
