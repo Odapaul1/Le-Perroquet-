@@ -32,9 +32,16 @@ const AssignmentManager: React.FC = () => {
     const fetchCourses = async () => {
       try {
         const data = await courseAPI.getAll();
-        const myCourses = data.filter((c: any) => c.instructorId === user?._id || user?.role === 'admin');
+        const myCourses = data.filter((c: any) => {
+          const instructorIdStr = c.instructorId?._id || c.instructorId;
+          return instructorIdStr === user?._id || user?.role === 'admin';
+        });
         setCourses(myCourses);
-        if (myCourses.length > 0) setSelectedCourseId(myCourses[0]._id);
+        if (myCourses.length > 0) {
+          setSelectedCourseId(myCourses[0]._id);
+        } else {
+          setSelectedCourseId('');
+        }
       } catch (error) {
         console.error('Failed to fetch courses:', error);
       }
@@ -104,6 +111,7 @@ const AssignmentManager: React.FC = () => {
                     value={selectedCourseId}
                     onChange={(e) => setSelectedCourseId(e.target.value)}
                   >
+                    {courses.length === 0 && <option value="" disabled>No courses allocated to you</option>}
                     {courses.map(c => <option key={c._id} value={c._id}>{c.title}</option>)}
                   </select>
                 </div>

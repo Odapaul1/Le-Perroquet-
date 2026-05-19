@@ -58,7 +58,7 @@ const AdminStats: React.FC = () => {
               <DollarSign className="w-4 h-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats?.overview.totalRevenue}</div>
+              <div className="text-2xl font-bold">₦{stats?.overview.totalRevenue}</div>
               <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
                 <ArrowUpRight className="w-3 h-3" /> +14.2% from last month
               </p>

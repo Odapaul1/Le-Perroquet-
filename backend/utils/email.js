@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 // Create transporter
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE || 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
@@ -17,7 +17,7 @@ const emailTemplates = {
     subject: 'Verify your email address',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">Welcome to Le' Perroque!</h2>
+        <h2 style="color: #333;">Welcome to Français Authentique!</h2>
         <p>Hi ${data.firstName},</p>
         <p>Thank you for signing up. Please click the link below to verify your email address:</p>
         <p style="margin: 30px 0;">

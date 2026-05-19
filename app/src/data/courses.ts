@@ -55,7 +55,7 @@ export interface ChatMessage {
 
 export const courses: Course[] = [
   {
-    id: 'c1',
+    id: '66388e6a1f1f1f1f1f1f1f01',
     title: 'French Café Conversations',
     titleFr: 'Conversations au Café Français',
     description: 'Master everyday interactions at French cafes, from ordering coffee to making small talk with locals.',
@@ -70,7 +70,7 @@ export const courses: Course[] = [
     categoryFr: 'Conversation',
   },
   {
-    id: 'c2',
+    id: '66388e6a1f1f1f1f1f1f1f02',
     title: 'Wine & Culture of Bordeaux',
     titleFr: 'Le Vin et la Culture de Bordeaux',
     description: 'Explore the rich wine culture of Bordeaux while learning sophisticated French vocabulary and expressions.',
@@ -85,7 +85,7 @@ export const courses: Course[] = [
     categoryFr: 'Culture',
   },
   {
-    id: 'c3',
+    id: '66388e6a1f1f1f1f1f1f1f03',
     title: 'Market Bargaining & Shopping',
     titleFr: 'Marchandage et Courses au Marché',
     description: 'Learn to navigate French markets with confidence, from asking prices to bargaining like a local.',
@@ -100,7 +100,7 @@ export const courses: Course[] = [
     categoryFr: 'Pratique',
   },
   {
-    id: 'c4',
+    id: '66388e6a1f1f1f1f1f1f1f04',
     title: 'Romantic Parisian Expressions',
     titleFr: 'Expressions Parisiennes Romantiques',
     description: 'Discover the poetic side of French with romantic phrases, love letters, and Parisian courtship language.',
@@ -115,7 +115,7 @@ export const courses: Course[] = [
     categoryFr: 'Expressions',
   },
   {
-    id: 'c5',
+    id: '66388e6a1f1f1f1f1f1f1f05',
     title: 'Business French Essentials',
     titleFr: 'Français des Affaires Essentiel',
     description: 'Professional French for the workplace — meetings, emails, presentations, and networking.',
@@ -130,7 +130,7 @@ export const courses: Course[] = [
     categoryFr: 'Affaires',
   },
   {
-    id: 'c6',
+    id: '66388e6a1f1f1f1f1f1f1f06',
     title: 'Advanced Grammar Mastery',
     titleFr: 'Maîtrise Avancée de la Grammaire',
     description: 'Conquer subjunctive, conditional, and complex tenses with clear explanations and exercises.',
@@ -147,14 +147,14 @@ export const courses: Course[] = [
 ];
 
 export const lessons: Lesson[] = [
-  { id: 'l1', courseId: 'c1', title: 'Ordering Coffee', titleFr: 'Commander un Café', duration: 8, completed: true },
-  { id: 'l2', courseId: 'c1', title: 'Asking for the Menu', titleFr: 'Demander le Menu', duration: 6, completed: true },
-  { id: 'l3', courseId: 'c1', title: 'Small Talk with the Barista', titleFr: 'Discuter avec le Barista', duration: 10, completed: true },
-  { id: 'l4', courseId: 'c1', title: 'Paying the Bill', titleFr: 'Payer l\'Addition', duration: 5, completed: true },
-  { id: 'l5', courseId: 'c1', title: 'Complimenting the Pastry', titleFr: 'Complimenter la Pâtisserie', duration: 7, completed: true },
-  { id: 'l6', courseId: 'c1', title: 'Asking for Recommendations', titleFr: 'Demander des Recommandations', duration: 9, completed: false },
-  { id: 'l7', courseId: 'c1', title: 'Describing Your Preferences', titleFr: 'Décrire Vos Préférences', duration: 8, completed: false },
-  { id: 'l8', courseId: 'c1', title: 'Saying Goodbye', titleFr: 'Dire Au Revoir', duration: 4, completed: false },
+  { id: 'l1', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Ordering Coffee', titleFr: 'Commander un Café', duration: 8, completed: true, videoUrl: '/videos/hero-bg.mp4' },
+  { id: 'l2', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Asking for the Menu', titleFr: 'Demander le Menu', duration: 6, completed: true, videoUrl: '/videos/hero-bg.mp4' },
+  { id: 'l3', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Small Talk with the Barista', titleFr: 'Discuter avec le Barista', duration: 10, completed: true, videoUrl: '/videos/hero-bg.mp4' },
+  { id: 'l4', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Paying the Bill', titleFr: 'Payer l\'Addition', duration: 5, completed: true, videoUrl: '/videos/hero-bg.mp4' },
+  { id: 'l5', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Complimenting the Pastry', titleFr: 'Complimenter la Pâtisserie', duration: 7, completed: true, videoUrl: '/videos/hero-bg.mp4' },
+  { id: 'l6', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Asking for Recommendations', titleFr: 'Demander des Recommandations', duration: 9, completed: false, videoUrl: '/videos/hero-bg.mp4' },
+  { id: 'l7', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Describing Your Preferences', titleFr: 'Décrire Vos Préférences', duration: 8, completed: false, videoUrl: '/videos/hero-bg.mp4' },
+  { id: 'l8', courseId: '66388e6a1f1f1f1f1f1f1f01', title: 'Saying Goodbye', titleFr: 'Dire Au Revoir', duration: 4, completed: false, videoUrl: '/videos/hero-bg.mp4' },
 ];
 
 export const vocabItems: VocabItem[] = [

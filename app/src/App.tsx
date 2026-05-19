@@ -12,10 +12,12 @@ import Lesson from './pages/Lesson';
 import InstructorDashboard from './pages/instructor/InstructorDashboard';
 import AdminCourses from './pages/admin/AdminCourses';
 import AdminStats from './pages/admin/AdminStats';
+import AdminUsers from './pages/admin/AdminUsers';
 import SessionManager from './pages/instructor/SessionManager';
 import AssignmentManager from './pages/instructor/AssignmentManager';
 import GradingCenter from './pages/instructor/GradingCenter';
 import PaymentMock from './pages/PaymentMock';
+import Checkout from './pages/Checkout';
 
 export default function App() {
   return (
@@ -101,10 +103,26 @@ export default function App() {
             } 
           />
           <Route 
+            path="/admin/users" 
+            element={
+              <ProtectedRoute roles={['admin']}>
+                <AdminUsers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/payment-mock" 
             element={
               <ProtectedRoute>
                 <PaymentMock />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/checkout/:courseId" 
+            element={
+              <ProtectedRoute>
+                <Checkout />
               </ProtectedRoute>
             } 
           />

@@ -45,6 +45,18 @@ export default function Vocabulary() {
     }
   }, [activeFilter, searchQuery, showFlashcards]);
 
+  const playAudio = (text: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.rate = 0.9; // Slightly slower for better learning
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   const statusConfig = {
     mastered: { color: 'text-green-600', bg: 'bg-green-50', label: t('vocab.mastered') },
     learning: { color: 'text-[#D4AF37]', bg: 'bg-[#D4AF37]/10', label: t('vocab.learning') },
@@ -100,7 +112,15 @@ export default function Vocabulary() {
                   <span className={`text-xs font-medium uppercase tracking-wider mb-4 ${statusConfig[current.status].color}`}>
                     {statusConfig[current.status].label}
                   </span>
-                  <h2 className="font-serif text-4xl text-[#1A1A1A] mb-2">{current.french}</h2>
+                  <div className="flex items-center gap-4 mb-2">
+                    <h2 className="font-serif text-4xl text-[#1A1A1A]">{current.french}</h2>
+                    <button 
+                      onClick={(e) => playAudio(current.french, e)}
+                      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <Volume2 className="w-6 h-6 text-[#D91A1A]" />
+                    </button>
+                  </div>
                   <p className="text-[#6B6B6B] text-sm font-mono">{current.pronunciation}</p>
                   <p className="text-[#6B6B6B]/60 text-xs mt-6">{language === 'en' ? 'Click to reveal' : 'Cliquez pour révéler'}</p>
                 </div>
@@ -222,7 +242,10 @@ export default function Vocabulary() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
                         <h3 className="font-serif text-xl text-[#1A1A1A]">{item.french}</h3>
-                        <button className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={(e) => playAudio(item.french, e)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
                           <Volume2 className="w-4 h-4 text-[#6B6B6B] hover:text-[#D91A1A]" />
                         </button>
                       </div>

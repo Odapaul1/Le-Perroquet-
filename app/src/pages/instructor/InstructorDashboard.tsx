@@ -12,10 +12,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 const InstructorDashboard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -24,7 +25,7 @@ const InstructorDashboard: React.FC = () => {
       try {
         const data = await courseAPI.getAll();
         // In dev, we just filter by instructorId if it exists, or show all for now
-        const myCourses = data.filter((c: any) => c.instructorId === user?._id);
+        const myCourses = data.filter((c: any) => c.instructorId === user?._id || c.instructorId?._id === user?._id);
         setCourses(myCourses);
       } catch (error) {
         console.error('Failed to fetch courses:', error);
@@ -45,9 +46,12 @@ const InstructorDashboard: React.FC = () => {
             <h1 className="font-serif text-3xl text-[#1A1A1A]">Instructor Dashboard</h1>
             <p className="text-[#6B6B6B]">Welcome back, {user?.firstName}. Ready to inspire?</p>
           </div>
-          <Button className="bg-[#D91A1A] hover:bg-[#D91A1A]/90">
+          <Button 
+            className="bg-[#D91A1A] hover:bg-[#D91A1A]/90"
+            onClick={() => navigate('/admin/courses')}
+          >
             <PlusCircle className="w-4 h-4 mr-2" />
-            Create New Course
+            Manage All Courses
           </Button>
         </header>
 
@@ -89,7 +93,6 @@ const InstructorDashboard: React.FC = () => {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-serif text-xl text-[#1A1A1A]">My Courses</h2>
-            <Link to="/instructor/courses" className="text-sm text-[#D91A1A] font-medium hover:underline">View All</Link>
           </div>
 
           <div className="space-y-4">
@@ -118,12 +121,19 @@ const InstructorDashboard: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">Edit</Button>
-                      <Button size="sm" className="bg-[#1A1A1A] hover:bg-[#1A1A1A]/90">
-                        View Stats
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate('/admin/courses')}
+                      >
+                        Edit
                       </Button>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="w-4 h-4" />
+                      <Button 
+                        size="sm" 
+                        className="bg-[#1A1A1A] hover:bg-[#1A1A1A]/90"
+                        onClick={() => navigate(`/lesson/${course._id}`)}
+                      >
+                        View Content
                       </Button>
                     </div>
                   </CardContent>
@@ -133,7 +143,13 @@ const InstructorDashboard: React.FC = () => {
               <div className="text-center py-12 bg-white rounded-lg border border-dashed border-[#1A1A1A]/10">
                 <PlusCircle className="w-12 h-12 text-[#1A1A1A]/10 mx-auto mb-4" />
                 <p className="text-[#6B6B6B]">You haven't created any courses yet.</p>
-                <Button variant="link" className="text-[#D91A1A]">Start creating your first course</Button>
+                <Button 
+                  variant="link" 
+                  className="text-[#D91A1A]"
+                  onClick={() => navigate('/admin/courses')}
+                >
+                  Start managing courses
+                </Button>
               </div>
             )}
           </div>

@@ -3,11 +3,11 @@ import { useSearchParams } from 'react-router';
 import { Sidebar } from '@/components/Sidebar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { enrollmentAPI, gamificationAPI } from '@/services/api';
+import { enrollmentAPI, gamificationAPI, courseAPI } from '@/services/api';
 import { Certificate } from '@/components/Certificate';
 import GamificationStats from '@/components/gamification/GamificationStats';
 import Leaderboard from '@/components/gamification/Leaderboard';
-import { courses, achievements, type ChatMessage } from '@/data/courses';
+import { type ChatMessage } from '@/data/courses';
 import {
   Flame,
   Star,
@@ -21,6 +21,7 @@ import {
   User,
   Download,
   CheckCircle,
+  Loader2,
 } from 'lucide-react';
 import { Link } from 'react-router';
 import gsap from 'gsap';
@@ -81,7 +82,7 @@ function MyCourses() {
                 </div>
                 <div className="flex gap-2">
                   <Link
-                    to={`/lesson/${e.courseId}`}
+                    to={`/lesson/${e.courseId?._id || e.courseId}`}
                     className="flex-1 flex items-center justify-center gap-2 py-2 bg-[#D91A1A] text-white rounded-sm text-sm font-medium hover:bg-[#b81616] transition-colors"
                   >
                     <Play className="w-3.5 h-3.5" fill="white" />
@@ -94,7 +95,7 @@ function MyCourses() {
                           <Download className="w-4 h-4 text-[#1A1A1A]" />
                         </button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-5xl p-0 overflow-hidden bg-[#F8F8F0]">
+                      <DialogContent className="max-w-5xl p-0 overflow-y-auto max-h-[90vh] bg-[#F8F8F0]">
                         <Certificate 
                           userName={`${user?.firstName} ${user?.lastName}`}
                           courseTitle={e.course?.title}
@@ -254,7 +255,7 @@ function AITutorPanel() {
   );
 }
 
-function AchievementsSection() {
+function AchievementsSection({ achievements, userAchievements }: { achievements: any[], userAchievements: any[] }) {
   const { language, t } = useLanguage();
   const icons: Record<string, typeof Trophy> = {
     Footprints: BookOpen,
@@ -270,26 +271,28 @@ function AchievementsSection() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {achievements.map((ach) => {
           const Icon = icons[ach.icon] || Trophy;
+          const isUnlocked = userAchievements?.some(ua => ua.achievementId === ach.id);
+          
           return (
             <div
               key={ach.id}
               className={`flex items-center gap-3 p-3 rounded-lg border ${
-                ach.unlocked
+                isUnlocked
                   ? 'border-[#D4AF37]/30 bg-[#D4AF37]/5'
                   : 'border-[#1A1A1A]/5 bg-[#EFEFDC]/50 opacity-50'
               }`}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                ach.unlocked ? 'bg-[#D4AF37]' : 'bg-[#1A1A1A]/10'
+                isUnlocked ? 'bg-[#D4AF37]' : 'bg-[#1A1A1A]/10'
               }`}>
-                <Icon className={`w-5 h-5 ${ach.unlocked ? 'text-white' : 'text-[#1A1A1A]/30'}`} />
+                <Icon className={`w-5 h-5 ${isUnlocked ? 'text-white' : 'text-[#1A1A1A]/30'}`} />
               </div>
               <div>
                 <p className="text-sm font-medium text-[#1A1A1A]">
-                  {language === 'en' ? ach.title : ach.titleFr}
+                  {language === 'en' ? ach.title : (ach.titleFr || ach.title)}
                 </p>
                 <p className="text-xs text-[#6B6B6B]">
-                  {language === 'en' ? ach.description : ach.descriptionFr}
+                  {language === 'en' ? ach.description : (ach.descriptionFr || ach.description)}
                 </p>
               </div>
             </div>
@@ -305,23 +308,32 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const showTutor = searchParams.get('tutor') === 'true';
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
+  const [achievements, setAchievements] = useState<any[]>([]);
+  const [userStats, setUserStats] = useState<any>(null);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const mainRef = useRef<HTMLDivElement>(null);
 
-  const [gamificationStatus, setGamificationStatus] = useState<any>(null);
-  const [loadingGamification, setLoadingGamification] = useState(true);
-
   useEffect(() => {
-    const fetchGamificationStatus = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const status = await gamificationAPI.getStatus();
-        setGamificationStatus(status);
+        setIsLoading(true);
+        const [achievementsData, statusData, coursesData] = await Promise.all([
+          gamificationAPI.getAchievements(),
+          gamificationAPI.getStatus(),
+          courseAPI.getAll()
+        ]);
+        setAchievements(achievementsData);
+        setUserStats(statusData);
+        setCourses(coursesData);
       } catch (error) {
-        console.error('Failed to fetch gamification status:', error);
+        console.error('Failed to fetch dashboard data:', error);
       } finally {
-        setLoadingGamification(false);
+        setIsLoading(false);
       }
     };
-    fetchGamificationStatus();
+    fetchDashboardData();
   }, []);
 
   useEffect(() => {
@@ -350,12 +362,12 @@ export default function Dashboard() {
           </div>
 
           {/* Gamification Stats */}
-          {!loadingGamification && gamificationStatus && (
+          {!isLoading && userStats && (
             <div className="mb-8">
               <GamificationStats 
-                points={gamificationStatus.points} 
-                level={gamificationStatus.level} 
-                achievements={gamificationStatus.achievements}
+                points={userStats.points} 
+                level={userStats.level} 
+                achievements={userStats.achievements}
               />
             </div>
           )}
@@ -365,7 +377,10 @@ export default function Dashboard() {
             <div className="lg:col-span-2 space-y-6">
               {showTutor ? <AITutorPanel /> : <MyCourses />}
               {/* Achievements */}
-              <AchievementsSection />
+              <AchievementsSection 
+                achievements={achievements} 
+                userAchievements={userStats?.achievements || []} 
+              />
             </div>
             
             <div className="space-y-6">
@@ -376,32 +391,36 @@ export default function Dashboard() {
               <div className="bg-white rounded-sm border border-[#1A1A1A]/5 p-6">
                 <h3 className="font-serif text-xl text-[#1A1A1A] mb-4">{t('dashboard.recommended')}</h3>
                 <div className="space-y-3">
-                  {courses.slice(1, 4).map((course) => (
-                    <Link
-                      key={course.id}
-                      to={`/lesson/${course.id}`}
-                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-[#EFEFDC] transition-colors group"
-                    >
-                      <img src={course.image} alt="" className="w-16 h-12 rounded-sm object-cover" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1A1A1A] truncate">
-                          {language === 'en' ? course.title : course.titleFr}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
-                          <Clock className="w-3 h-3" />
-                          <span>{course.duration} {t('library.duration')}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs ${
-                            course.level === 'beginner' ? 'bg-green-100 text-green-700' :
-                            course.level === 'intermediate' ? 'bg-[#D4AF37]/10 text-[#D4AF37]' :
-                            'bg-[#D91A1A]/10 text-[#D91A1A]'
-                          }`}>
-                            {t(`library.${course.level}`)}
-                          </span>
+                  {courses.length > 0 ? (
+                    courses.slice(0, 3).map((course) => (
+                      <Link
+                        key={course._id || course.id}
+                        to={`/lesson/${course._id || course.id}`}
+                        className="flex items-center gap-4 p-3 rounded-lg hover:bg-[#EFEFDC] transition-colors group"
+                      >
+                        <img src={course.thumbnail || course.image || '/images/course-1.jpg'} alt="" className="w-16 h-12 rounded-sm object-cover" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#1A1A1A] truncate">
+                            {language === 'en' ? course.title : (course.titleFr || course.title)}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
+                            <Clock className="w-3 h-3" />
+                            <span>{course.duration} {t('library.duration')}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${
+                              course.level === 'beginner' ? 'bg-green-100 text-green-700' :
+                              course.level === 'intermediate' ? 'bg-[#D4AF37]/10 text-[#D4AF37]' :
+                              'bg-[#D91A1A]/10 text-[#D91A1A]'
+                            }`}>
+                              {t(`library.${course.level}`)}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-[#6B6B6B] group-hover:text-[#D91A1A] transition-colors" />
-                    </Link>
-                  ))}
+                        <ChevronRight className="w-4 h-4 text-[#6B6B6B] group-hover:text-[#D91A1A] transition-colors" />
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-sm text-[#6B6B6B] text-center py-4">No recommendations available</p>
+                  )}
                 </div>
               </div>
             </div>

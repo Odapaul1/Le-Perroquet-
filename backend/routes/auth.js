@@ -1,5 +1,6 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { generateTokens, authenticate } from '../middleware/auth.js';
 import { AppError } from '../utils/AppError.js';
@@ -12,6 +13,7 @@ const router = express.Router();
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log('Validation errors:', errors.array());
     return res.status(400).json({
       success: false,
       errors: errors.array()
@@ -43,8 +45,8 @@ router.post('/register', [
     .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
   body('role')
     .optional()
-    .isIn(['learner', 'instructor'])
-    .withMessage('Role must be either learner or instructor')
+    .isIn(['learner', 'instructor', 'admin'])
+    .withMessage('Role must be either learner, instructor or admin')
 ], handleValidationErrors, async (req, res, next) => {
   try {
     const { firstName, lastName, email, password, role = 'learner' } = req.body;
@@ -70,30 +72,9 @@ router.post('/register', [
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(user._id);
 
-    // Generate email verification token
-    const verificationToken = user.generateEmailVerificationToken();
-    await user.save({ validateBeforeSave: false });
-
-    // Send verification email
-    try {
-      await sendEmail({
-        to: user.email,
-        subject: 'Verify your email address',
-        template: 'emailVerification',
-        data: {
-          firstName: user.firstName,
-          verificationToken,
-          frontendUrl: process.env.FRONTEND_URL
-        }
-      });
-    } catch (emailError) {
-      console.error('Email sending error:', emailError);
-      // Continue with registration even if email fails
-    }
-
     res.status(201).json({
       success: true,
-      message: 'User registered successfully. Please check your email to verify your account.',
+      message: 'User registered successfully.',
       data: {
         user,
         accessToken,
@@ -137,9 +118,8 @@ router.post('/login', [
       return next(new AppError('Invalid credentials', 401));
     }
 
-    // Update last login
-    user.lastLogin = new Date();
-    await user.save({ validateBeforeSave: false });
+    // Update last login without triggering pre-save hooks
+    await User.findByIdAndUpdate(user._id, { lastLogin: new Date() });
 
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(user._id);

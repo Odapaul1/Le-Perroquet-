@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams, Link } from 'react-router';
+import { useParams, Link, useNavigate } from 'react-router';
 import { Sidebar } from '@/components/Sidebar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { sessionAPI, assignmentAPI } from '@/services/api';
+import { sessionAPI, assignmentAPI, courseAPI, enrollmentAPI } from '@/services/api';
 import { courses, lessons, quizQuestions, type ChatMessage } from '@/data/courses';
 import { 
   Play,
@@ -51,8 +51,11 @@ const transcriptData = [
 export default function Lesson() {
   const { courseId } = useParams<{ courseId: string }>();
   const { language, t } = useLanguage();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('transcript');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [showResult, setShowResult] = useState(false);
   const [tutorMessages, setTutorMessages] = useState<ChatMessage[]>([
@@ -65,25 +68,69 @@ export default function Lesson() {
   const [assignments, setAssignments] = useState<any[]>([]);
   const [submissionData, setSubmissionData] = useState({ textContent: '', contentUrl: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState<boolean | null>(null);
+  const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
-  const course = courses.find(c => c.id === courseId) || courses[0];
-  const courseLessons = lessons.filter(l => l.courseId === course.id);
+  const courseFromData = courses.find(c => c.id === courseId);
+  const [dbCourse, setDbCourse] = useState<any>(null);
+  const course = courseFromData || dbCourse;
+  
+  // Extract lessons from course modules if available, otherwise use static lessons
+  const courseLessons = course?.modules 
+    ? course.modules.flatMap((m: any) => m.subModules || []).flatMap((sm: any) => sm.topics || [])
+    : lessons.filter(l => l.courseId === (courseId || course?.id));
+    
+  const currentLesson = courseLessons[currentLessonIndex] || courseLessons[0] || { title: 'No Lessons Found', titleFr: 'Aucune leçon trouvée', duration: 0 };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const checkEnrollment = async () => {
+      // ── Step 1: Fetch course + verify enrollment ──────────────────
+      // This block is the only one that should redirect on failure.
+      try {
+        if (!courseFromData && courseId) {
+          const fetchedCourse = await courseAPI.getById(courseId);
+          setDbCourse(fetchedCourse);
+        }
+
+        const enrollments = await enrollmentAPI.getMyEnrollments();
+        const currentEnrollment = enrollments.find((e: any) => {
+          const enrolledCourseId = (e.courseId?._id || e.courseId)?.toString();
+          const currentCourseId = courseId?.toString();
+          return enrolledCourseId === currentCourseId;
+        });
+
+        if (!currentEnrollment) {
+          toast.error('You must be enrolled to access this course.');
+          navigate('/library');
+          return;
+        }
+
+        setIsEnrolled(true);
+        setEnrollmentId(currentEnrollment._id);
+      } catch (error) {
+        console.error('Failed to verify enrollment:', error);
+        setIsEnrolled(false);
+        navigate('/library');
+        return;
+      }
+
+      // ── Step 2: Load supplementary data (non-critical) ───────────
+      // Sessions/assignments failing must NEVER redirect the learner.
       try {
         const [sessionsData, assignmentsData] = await Promise.all([
-          sessionAPI.getByCourse(courseId || course.id),
-          assignmentAPI.getByCourse(courseId || course.id)
+          sessionAPI.getByCourse(courseId!),
+          assignmentAPI.getByCourse(courseId!),
         ]);
-        setRecordedSessions(sessionsData);
-        setAssignments(assignmentsData);
+        setRecordedSessions(sessionsData ?? []);
+        setAssignments(assignmentsData ?? []);
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        console.warn('Could not load sessions/assignments (non-critical):', error);
+        setRecordedSessions([]);
+        setAssignments([]);
       }
     };
-    fetchData();
+    checkEnrollment();
   }, [courseId]);
 
   const handleSubmitAssignment = async (assignmentId: string) => {
@@ -113,6 +160,18 @@ export default function Lesson() {
       );
     }
   }, []);
+
+  const handleCompleteLesson = async () => {
+    if (!enrollmentId || !currentLesson) return;
+    try {
+      await enrollmentAPI.updateProgress(enrollmentId, currentLesson._id || currentLesson.id);
+      setCompleted(true);
+      toast.success('Lesson marked as completed!');
+    } catch (error) {
+      console.error('Failed to update progress', error);
+      toast.error('Failed to mark lesson as completed');
+    }
+  };
 
   const handleQuizAnswer = (questionId: string, optionIndex: number) => {
     setQuizAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
@@ -158,6 +217,25 @@ export default function Lesson() {
     { id: 'assignments', label: 'Tasks', icon: Pen },
   ];
 
+  if (isEnrolled === null || !course) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F0] flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-[#D91A1A] animate-spin" />
+      </div>
+    );
+  }
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F8F0]">
       <Sidebar />
@@ -170,13 +248,17 @@ export default function Lesson() {
             </Link>
             <div>
               <h1 className="font-serif text-lg text-[#1A1A1A]">
-                {language === 'en' ? course.title : course.titleFr}
+                {language === 'en' ? currentLesson.title : currentLesson.titleFr}
               </h1>
               <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
                 <Clock className="w-3 h-3" />
-                <span>{course.duration} {t('library.duration')}</span>
+                <span>{currentLesson.duration} {t('library.duration')}</span>
                 <span className="mx-1">•</span>
-                <span>{course.completedLessons}/{course.totalLessons} {t('dashboard.completed').toLowerCase()}</span>
+                <span>
+                  {course.completedLessons !== undefined ? course.completedLessons : 0}/
+                  {course.totalLessons !== undefined ? course.totalLessons : courseLessons.length} 
+                  {' '}{t('dashboard.completed').toLowerCase()}
+                </span>
               </div>
             </div>
           </div>
@@ -186,10 +268,11 @@ export default function Lesson() {
               <span className="hidden sm:inline">{t('lesson.download')}</span>
             </button>
             <button
-              onClick={() => setCompleted(!completed)}
+              onClick={handleCompleteLesson}
+              disabled={completed}
               className={`flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-medium transition-all ${
                 completed
-                  ? 'bg-green-500 text-white'
+                  ? 'bg-green-500 text-white cursor-not-allowed opacity-80'
                   : 'bg-[#D91A1A] text-white hover:bg-[#b81616]'
               }`}
             >
@@ -202,15 +285,28 @@ export default function Lesson() {
         <div className="flex">
           {/* Left: Video Player */}
           <div className="flex-1">
-            <div className="aspect-video bg-[#1A1A1A] relative flex items-center justify-center">
-              <img
-                src={course.image}
-                alt=""
-                className="w-full h-full object-cover opacity-60"
-              />
+            <div className="aspect-video bg-[#1A1A1A] relative flex items-center justify-center group">
+              {(currentLesson.videoUrl || currentLesson.contentUrl) ? (
+                <video
+                  ref={videoRef}
+                  src={currentLesson.videoUrl || currentLesson.contentUrl}
+                  className="w-full h-full object-contain"
+                  onClick={togglePlay}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                />
+              ) : (
+                <div className="text-white text-center">
+                  <Video className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                  <p className="text-sm opacity-50">Video not available</p>
+                </div>
+              )}
+              
               <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="absolute w-20 h-20 rounded-full bg-[#D91A1A] flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+                onClick={togglePlay}
+                className={`absolute w-20 h-20 rounded-full bg-[#D91A1A] flex items-center justify-center shadow-xl transition-all duration-300 ${
+                  isPlaying ? 'opacity-0 group-hover:opacity-100 scale-90' : 'opacity-100 scale-100'
+                }`}
               >
                 {isPlaying ? (
                   <Pause className="w-8 h-8 text-white" fill="white" />
@@ -221,7 +317,10 @@ export default function Lesson() {
 
               {/* Progress Bar */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-                <div className="h-full bg-[#D91A1A] w-1/3" />
+                <div 
+                  className="h-full bg-[#D91A1A] transition-all duration-300" 
+                  style={{ width: isPlaying ? '100%' : '0%', transitionDuration: isPlaying ? `${currentLesson.duration * 60}s` : '0.3s' }} 
+                />
               </div>
             </div>
 
@@ -245,21 +344,26 @@ export default function Lesson() {
                 {courseLessons.map((lesson, index) => (
                   <div
                     key={lesson.id}
+                    onClick={() => {
+                      setCurrentLessonIndex(index);
+                      setIsPlaying(false);
+                      setCompleted(false); // Reset the complete button for the new lesson
+                    }}
                     className={`flex items-center gap-4 p-3 rounded-sm cursor-pointer transition-colors ${
-                      index === 0 ? 'bg-[#D91A1A]/5 border border-[#D91A1A]/20' : 'hover:bg-[#EFEFDC]'
+                      index === currentLessonIndex ? 'bg-[#D91A1A]/5 border border-[#D91A1A]/20' : 'hover:bg-[#EFEFDC]'
                     }`}
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      lesson.completed ? 'bg-green-500' : index === 0 ? 'bg-[#D91A1A]' : 'bg-[#EFEFDC]'
+                      lesson.completed ? 'bg-green-500' : index === currentLessonIndex ? 'bg-[#D91A1A]' : 'bg-[#EFEFDC]'
                     }`}>
                       {lesson.completed ? (
                         <Check className="w-4 h-4 text-white" />
                       ) : (
-                        <Play className={`w-3 h-3 ${index === 0 ? 'text-white ml-0.5' : 'text-[#6B6B6B] ml-0.5'}`} fill="currentColor" />
+                        <Play className={`w-3 h-3 ${index === currentLessonIndex ? 'text-white ml-0.5' : 'text-[#6B6B6B] ml-0.5'}`} fill="currentColor" />
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className={`text-sm font-medium ${index === 0 ? 'text-[#D91A1A]' : 'text-[#1A1A1A]'}`}>
+                      <p className={`text-sm font-medium ${index === currentLessonIndex ? 'text-[#D91A1A]' : 'text-[#1A1A1A]'}`}>
                         {language === 'en' ? lesson.title : lesson.titleFr}
                       </p>
                     </div>

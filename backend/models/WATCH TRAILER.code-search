@@ -1,0 +1,9 @@
+# Query: WATCH TRAILER
+# ContextLines: 1
+
+1 result - 1 file
+
+app\src\contexts\LanguageContext.tsx:
+  30      'hero.subtitle': 'Immerse yourself in authentic French through cinematic scenarios, AI-powered conversations, and cultural mastery.',
+  31:     'hero.play': 'lE',
+  32      'hero.learners': 'Active Learners',

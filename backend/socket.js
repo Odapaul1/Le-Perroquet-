@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
-import inMemoryDB from './db/inMemoryDB.js';
+import User from './models/User.js';
+import Enrollment from './models/Enrollment.js';
 
 export const setupSocket = (server) => {
   const io = new Server(server, {
@@ -19,9 +20,11 @@ export const setupSocket = (server) => {
     socket.on('join_course', async ({ courseId, userId }) => {
       try {
         // Verify enrollment for learners
-        const user = await inMemoryDB.User.findById(userId);
+        const user = await User.findById(userId);
+        if (!user) return socket.emit('error', { message: 'User not found' });
+        
         if (user.role === 'learner') {
-          const enrollment = await inMemoryDB.Enrollment.findOne({ userId, courseId });
+          const enrollment = await Enrollment.findOne({ userId, courseId });
           if (!enrollment) {
             return socket.emit('error', { message: 'Not enrolled in this course' });
           }

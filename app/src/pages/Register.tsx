@@ -61,7 +61,14 @@ const Register: React.FC = () => {
       
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', err.response?.data);
+      const errorMessage = 
+        err.response?.data?.error?.message || 
+        err.response?.data?.message || 
+        (err.response?.data?.errors && err.response.data.errors.length > 0 
+          ? err.response.data.errors[0].msg 
+          : 'Registration failed. Please try again.');
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

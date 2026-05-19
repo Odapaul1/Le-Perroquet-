@@ -32,7 +32,7 @@ export function Navigation() {
             <span className="text-white font-serif text-sm font-bold">F</span>
           </div>
           <span className={`font-serif text-lg font-medium ${isHome ? 'text-[#F8F8F0]' : 'text-[#1A1A1A]'}`}>
-            Le' Perroque
+            Français Authentique
           </span>
         </Link>
 
